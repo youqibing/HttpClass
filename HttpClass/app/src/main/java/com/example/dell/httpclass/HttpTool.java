@@ -18,7 +18,7 @@ import java.util.Set;
  */
 
 /**
- * Get方法
+ * Get方法，第一个参数是网址，第二个参数是Body,嗯GET也是有Body的，只不过一并搞在URL里边提交上去了
  */
 
 public class HttpTool {
@@ -104,6 +104,7 @@ public class HttpTool {
                     URL url = new URL(UrlPost);
                     connection =(HttpURLConnection)url.openConnection();
                     connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(5000);
 
