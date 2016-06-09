@@ -2,13 +2,14 @@ package com.example.dell.httpclass;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by dell on 2016/6/9.
@@ -18,7 +19,12 @@ import java.util.Map;
 public class TestActivty extends Activity {
 
     private Button getbtn;
-    private TextView responsetx;
+    private TextView responseTX;
+    private Handler handler;
+    private Bundle data;
+
+    private static final int UPDATE_TEXT=1;
+    private static final int ERROR=2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,37 +32,56 @@ public class TestActivty extends Activity {
         setContentView(R.layout.test_layout);
 
         getbtn= (Button) findViewById(R.id.button);
-        responsetx = (TextView)findViewById(R.id.textView2);
+        responseTX = (TextView)findViewById(R.id.textView2);
 
+        handler = new Handler(){
+          public void handleMessage(Message msg){
+              switch (msg.what){
+                  case UPDATE_TEXT:
+
+                      Bundle getData =msg.getData();
+                      String response = getData.getString("text");
+                      Log.e("xxx","6");
+                      responseTX.setText(response);
+                      break;
+
+                  case ERROR:
+                      Toast.makeText(TestActivty.this,"啊哦，出错了",Toast.LENGTH_SHORT).show();
+
+              }
+          }
+        };
 
 
         getbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Map<String,String> params = new HashMap<String,String>();
-                params.put("plg_nld","1");
-                params.put("plg_usr","1");
-                params.put("plg_uin","1");
-                params.put("plg_auth","1");
-                params.put("webid","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1Ijo1NTA4NzkwLCJpZCI6NTIwMTcyOH0.X5lfGey8j0FA_joZvE0OuytydIp1OzvMiODhWqsM7CU");
-                params.put("src","app");
-                params.put("plg_dev","1");
-                params.put("plg_vkey","1");
-                params.put("from","groupmessage");
-                params.put("isappinstalled","0");
+                String Url = "https://www.baidu.com/";
+                Log.e("xxx","1");
 
-                String Url = "maimai.cn/web/gossip_detail";
-
-                HttpTool.sendGetRequest(Url, params, null, new HttpCallBackListener() {
+                HttpTool.sendGetRequest(Url, null, null, new HttpCallBackListener() {
                     @Override
                     public void onRespone(String response) {
-                        responsetx.setText("response");
+                        Log.e("xxx","xxx");
+                        Log.e("xxx",response);
+
+                        Message message = new Message();
+                        data = new Bundle();
+                        data.putString("text",response);
+                        message.what = UPDATE_TEXT;
+                        message.setData(data);
+
+                        handler.sendMessage(message);
                     }
 
                     @Override
                     public void onError(Exception e) {
-                        Toast.makeText(TestActivty.this,"啊哦，出错了",Toast.LENGTH_SHORT).show();
+
+                        Message message = new Message();
+                        message.what = ERROR;
+
+                        handler.sendMessage(message);
                     }
                 });
 

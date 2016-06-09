@@ -1,5 +1,7 @@
 package com.example.dell.httpclass;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,11 +29,14 @@ public class HttpTool {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.e("xxx","2");
                 HttpURLConnection connection = null;
+
                 try {
                     StringBuilder buffer = new StringBuilder(UrlGet);
                     Set<Map.Entry<String,String>> entrys = null;
 
+                    Log.e("xxx","3");
 
                     //第一部分，如果是GET请求，参数在URL中。
                     if(Params!=null&&Params.isEmpty()){
@@ -48,11 +53,23 @@ public class HttpTool {
                     connection.setConnectTimeout(5000);
                     connection.setReadTimeout(5000);
 
+                    Log.e("xxx","4");
+
                     //这一部分是获取服务器传给我们的数据的
                     InputStream inputStream = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                     StringBuilder response = new StringBuilder("");
                     String readLine ="";
+
+                    Log.e("xxx","5");
+
+                    //这部分是设置Headers
+                    if(Headers!=null&&!Headers.isEmpty()){
+                        entrys=Params.entrySet();
+                        for(Map.Entry<String,String> entry : entrys){
+                            connection.setRequestProperty(entry.getKey(),entry.getValue());
+                        }
+                    }
 
                     while((readLine=reader.readLine())!=null){
                             response.append(readLine);
@@ -62,13 +79,7 @@ public class HttpTool {
                         callBackListener.onRespone(response.toString());
                     }
 
-                    //这部分是设置Headers
-                    if(Headers!=null&&!Headers.isEmpty()){
-                        entrys=Params.entrySet();
-                        for(Map.Entry<String,String> entry : entrys){
-                            connection.setRequestProperty(entry.getKey(),entry.getValue());
-                        }
-                    }
+
 
                 }catch (Exception e){
 
@@ -86,7 +97,7 @@ public class HttpTool {
                     }
                 }
             }
-        });
+        }).start();
 
     }
 
